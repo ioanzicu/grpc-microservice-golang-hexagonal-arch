@@ -1,6 +1,9 @@
 package api
 
-import "github.com/ioanzicu/microservices/order/internal/application/core/domain"
+import (
+	"github.com/ioanzicu/microservices/order/internal/application/core/domain"
+	"github.com/ioanzicu/microservices/order/internal/ports"
+)
 
 type Application struct {
 	db ports.DBPort
