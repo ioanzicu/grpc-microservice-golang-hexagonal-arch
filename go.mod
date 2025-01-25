@@ -3,7 +3,6 @@ module github.com/ioanzicu/microservices/order
 go 1.22.5
 
 require (
-	github.com/go-sql-driver/mysql v1.7.0
 	github.com/ioanzicu/microservices-proto/golang/order v0.0.0-20250125212032-d09d8ca1df15
 	google.golang.org/grpc v1.43.0
 	gorm.io/driver/mysql v1.5.7
@@ -11,6 +10,7 @@ require (
 )
 
 require (
+	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/golang/protobuf v1.5.0 // indirect
 	github.com/jinzhu/inflection v1.0.0 // indirect
 	github.com/jinzhu/now v1.1.5 // indirect

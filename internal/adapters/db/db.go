@@ -3,7 +3,6 @@ package db
 import (
 	"fmt"
 
-	"github.com/go-sql-driver/mysql"
 	"github.com/ioanzicu/microservices/order/internal/application/core/domain"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -58,7 +57,7 @@ func (a Adapter) Get(id string) (domain.Order, error) {
 		ID:         int64(orderEntity.ID),
 		CustomerID: orderEntity.CustomerID,
 		Status:     orderEntity.Status,
-		OrderItems: orderEntity.Status,
+		OrderItems: orderItems,
 		CreatedAt:  orderEntity.CreatedAt.UnixNano(),
 	}
 	return order, res.Error
