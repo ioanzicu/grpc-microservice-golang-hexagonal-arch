@@ -27,3 +27,28 @@ Testing gRPC using [grpcurl](https://github.com/fullstorydev/grpcurl)
     
     kill -9 <PID>
     
+
+## Update Go Pakcages / Modules
+
+    go get -u ./... && go mod tidy
+
+
+## Tag the commit
+
+
+### Create the tag
+
+    git tag v1.0
+
+### Push tags
+
+    git push origin v1.0
+
+    OR 
+
+    git push --tags
+
+### List tags
+
+    git tag
+
