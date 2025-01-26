@@ -4,7 +4,30 @@ import (
 	"log"
 	"os"
 	"strconv"
+
+	"github.com/joho/godotenv"
 )
+
+// init() will run only once.
+// init() will run after global variable initialization of each package and
+// before main() function. init() will only run if the package is imported.
+func init() {
+	fileName := ".env"
+	if fileExists(fileName) {
+		err := godotenv.Load()
+		if err != nil {
+			log.Fatalf("Error loading .env file: %s", err)
+		}
+	}
+}
+
+func fileExists(fileName string) bool {
+	info, err := os.Stat(fileName)
+	if os.IsNotExist(err) {
+		return false
+	}
+	return !info.IsDir()
+}
 
 func GetEnv() string {
 	return getEnvironmentValue("ENV")
@@ -19,7 +42,7 @@ func GetApplicationPort() int {
 	port, err := strconv.Atoi(portStr)
 
 	if err != nil {
-		log.Fatalf("port: %s is invalid", &portStr)
+		log.Fatalf("port: %s is invalid", portStr)
 	}
 
 	return port
