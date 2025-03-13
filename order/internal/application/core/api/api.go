@@ -1,7 +1,7 @@
 package api
 
 import (
-	"strings"
+	"context"
 
 	"github.com/ioanzicu/microservices/order/internal/application/core/domain"
 	"github.com/ioanzicu/microservices/order/internal/ports"
@@ -22,26 +22,17 @@ func NewApplication(db ports.DBPort, payment ports.PaymentPort) *Application {
 	}
 }
 
-func (a Application) PlaceOrder(order domain.Order) (domain.Order, error) {
-	err := a.db.Save(&order)
+func (a Application) PlaceOrder(ctx context.Context, order domain.Order) (domain.Order, error) {
+	err := a.db.Save(ctx, &order)
 	if err != nil {
 		return domain.Order{}, err
 	}
-	paymentErr := a.payment.Charge(&order)
+	paymentErr := a.payment.Charge(ctx, &order)
 	if paymentErr != nil {
-		st := status.Convert(paymentErr)
-		var allErrors []string
-		for _, detail := range st.Details() {
-			switch t := detail.(type) {
-			case *errdetails.BadRequest:
-				for _, violation := range t.GetFieldViolations() {
-					allErrors = append(allErrors, violation.Description)
-				}
-			}
-		}
+		st, _ := status.FromError(paymentErr)
 		fieldErr := &errdetails.BadRequest_FieldViolation{
 			Field:       "payment",
-			Description: strings.Join(allErrors, "\n"),
+			Description: st.Message(),
 		}
 		badReq := &errdetails.BadRequest{}
 		badReq.FieldViolations = append(badReq.FieldViolations, fieldErr)
@@ -50,4 +41,8 @@ func (a Application) PlaceOrder(order domain.Order) (domain.Order, error) {
 		return domain.Order{}, statusWithDetails.Err()
 	}
 	return order, nil
+}
+
+func (a Application) GetOrder(ctx context.Context, id int64) (domain.Order, error) {
+	return a.db.Get(ctx, id)
 }
