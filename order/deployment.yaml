@@ -42,7 +42,7 @@ spec:
           - name: ENV
             value: "prod"
           - name: DATA_SOURCE_URL
-            value: "root:r00t-sEcr3T@tcp(mysql:3306)/orders?charset=utf8mb4&parseTime=True&loc=Local"
+            value: "root:impossibletoguess@tcp(mysql:3306)/orders?charset=utf8mb4&parseTime=True&loc=Local"
           - name: PAYMENT_SERVICE_URL
             value: "payment:8081"
         ports:

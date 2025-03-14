@@ -21,8 +21,7 @@ type OrderDatabaseTestSuite struct {
 
 const mysqlPassword string = "impossibletoguess"
 
-func (o *OrderDatabaseTestSuite) SetUpSuite() {
-
+func (o *OrderDatabaseTestSuite) SetupSuite() {
 	ctx := context.Background()
 	port := "3306/tcp"
 	dbURL := func(host string, port nat.Port) string {
@@ -30,13 +29,13 @@ func (o *OrderDatabaseTestSuite) SetUpSuite() {
 	}
 
 	req := testcontainers.ContainerRequest{
-		Image:        "docker.io/mysql:8.8.30",
+		Image:        "docker.io/mysql:8.0.30",
 		ExposedPorts: []string{port},
 		Env: map[string]string{
 			"MYSQL_ROOT_PASSWORD": mysqlPassword,
 			"MYSQL_DATABASE":      "orders",
 		},
-		WaitingFor: wait.ForSQL(nat.Port(port), "mysql", dbURL).WithStartupTimeout(30 * time.Second),
+		WaitingFor: wait.ForSQL(nat.Port(port), "mysql", dbURL).WithStartupTimeout(10 * time.Second),
 	}
 
 	mysqlContainer, err := testcontainers.GenericContainer(ctx, testcontainers.GenericContainerRequest{

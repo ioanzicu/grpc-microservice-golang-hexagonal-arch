@@ -71,7 +71,7 @@ func (l customLogger) Format(entry *log.Entry) ([]byte, error) {
 }
 
 func main() {
-	tp, err := traceProvider("http://jaeger-otel.jaeger.svc.cluster.local:14278/api/traces")
+	tp, err := traceProvider("jaeger-otel.jaeger.svc.cluster.local:14278/api/traces")
 	if err != nil {
 		log.Fatal(err)
 	}
