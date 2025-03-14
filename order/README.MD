@@ -13,7 +13,7 @@ Testing gRPC using [grpcurl](https://github.com/fullstorydev/grpcurl)
 
     docker run -p 3306:3306 \
         -e MYSQL_ROOT_PASSWORD=impossibletoguess \
-        -e MYSQL_DATABASE=order mysql
+        -e MYSQL_DATABASE=orders mysql
 
 ## grpcURL Example:
 

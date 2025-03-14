@@ -19,7 +19,7 @@ type OrderDatabaseTestSuite struct {
 	DataSourceUrl string
 }
 
-const mysqlPassword string = "r00t-sEcr3T"
+const mysqlPassword string = "impossibletoguess"
 
 func (o *OrderDatabaseTestSuite) SetUpSuite() {
 
@@ -51,9 +51,9 @@ func (o *OrderDatabaseTestSuite) SetUpSuite() {
 }
 
 func (o *OrderDatabaseTestSuite) TestShouldSaveOrder() {
-	adaper, err := NewAdapter(o.DataSourceUrl)
+	adapter, err := NewAdapter(o.DataSourceUrl)
 	o.Nil(err)
-	saveErr := adaper.Save(context.Background(), &domain.Order{})
+	saveErr := adapter.Save(context.Background(), &domain.Order{})
 	o.Nil(saveErr)
 }
 
