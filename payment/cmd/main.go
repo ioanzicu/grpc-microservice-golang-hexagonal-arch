@@ -1,6 +1,8 @@
 package main
 
 import (
+	"context"
+	"fmt"
 	"os"
 
 	"github.com/ioanzicu/microservices/payment/config"
@@ -8,38 +10,41 @@ import (
 	"github.com/ioanzicu/microservices/payment/internal/adapters/grpc"
 	"github.com/ioanzicu/microservices/payment/internal/application/core/api"
 	log "github.com/sirupsen/logrus"
+	"google.golang.org/grpc/credentials/insecure"
 
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/attribute"
-	"go.opentelemetry.io/otel/exporters/jaeger"
+	"go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracegrpc"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/resource"
 	tracesdk "go.opentelemetry.io/otel/sdk/trace"
 	semconv "go.opentelemetry.io/otel/semconv/v1.11.0"
 	"go.opentelemetry.io/otel/trace"
+	grpcLib "google.golang.org/grpc"
 )
 
-const (
-	service     = "payment"
-	environment = "dev"
-	id          = 2
-)
+func tracerProvider(ctx context.Context, url string) (*tracesdk.TracerProvider, error) {
+	conn, err := grpcLib.NewClient(url,
+		// 	// Note the use of insecure transport here. TLS is recommended in production.
+		grpcLib.WithTransportCredentials(insecure.NewCredentials()),
+		grpcLib.WithBlock(),
+	)
 
-func traceProvider(url string) (*tracesdk.TracerProvider, error) {
-	// Create the Jaeger exporter
-	exp, err := jaeger.New(jaeger.WithCollectorEndpoint(jaeger.WithEndpoint(url)))
+	if err != nil {
+		return nil, fmt.Errorf("failed to create gRPC connection to collector: %w", err)
+	}
+
+	traceExporter, err := otlptracegrpc.New(ctx, otlptracegrpc.WithGRPCConn(conn))
 	if err != nil {
 		return nil, err
 	}
 	tp := tracesdk.NewTracerProvider(
-		// Always be sure to batch in production
-		tracesdk.WithBatcher(exp),
-		// Record information about this application in a Resource
+		tracesdk.WithBatcher(traceExporter),
 		tracesdk.WithResource(resource.NewWithAttributes(
 			semconv.SchemaURL,
-			semconv.ServiceNameKey.String(service),
-			attribute.String("environment", environment),
-			attribute.Int64("ID", id),
+			semconv.ServiceNameKey.String(config.GetServiceName()),
+			attribute.String("environment", config.GetEnvironmentType()),
+			attribute.Int64("ID", config.GetServiceID()),
 		)),
 	)
 	return tp, nil
@@ -71,7 +76,7 @@ func (l customLogger) Format(entry *log.Entry) ([]byte, error) {
 }
 
 func main() {
-	tp, err := traceProvider("jaeger-otel.jaeger.svc.cluster.local:14278/api/traces")
+	tp, err := tracerProvider(context.Background(), config.GetTracerProviderURL())
 	if err != nil {
 		log.Fatal(err)
 	}

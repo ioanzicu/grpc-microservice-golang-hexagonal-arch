@@ -35,7 +35,7 @@ func (a Adapter) Run() {
 	grpcServer := grpc.NewServer(grpc.UnaryInterceptor(otelgrpc.UnaryServerInterceptor()))
 	a.server = grpcServer
 	payment.RegisterPaymentServer(grpcServer, a)
-	if config.GetEnv() == "development" {
+	if config.GetEnvironmentType() == "development" {
 		reflection.Register(grpcServer)
 	}
 

@@ -29,7 +29,7 @@ func fileExists(fileName string) bool {
 	return !info.IsDir()
 }
 
-func GetEnv() string {
+func GetEnvironmentType() string {
 	return getEnvironmentValue("ENV")
 }
 
@@ -46,6 +46,23 @@ func GetApplicationPort() int {
 	}
 
 	return port
+}
+
+func GetServiceName() string {
+	return getEnvironmentValue("SERVICE_NAME")
+}
+
+func GetServiceID() int64 {
+	id := getEnvironmentValue("SERVICE_ID")
+	idInt64, err := strconv.ParseInt(id, 10, 64)
+	if err != nil {
+		log.Fatalf("Cannot parse ID to int64, error: %v", err)
+	}
+	return idInt64
+}
+
+func GetTracerProviderURL() string {
+	return getEnvironmentValue("TRACER_PROVIDER_URL")
 }
 
 func getEnvironmentValue(key string) string {
